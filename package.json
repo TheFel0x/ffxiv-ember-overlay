@@ -78,6 +78,9 @@
 		]
 	},
 	"homepage": ".",
+	"overrides": {
+		"react-draggable": "4.4.6"
+	},
 	"devDependencies": {
 		"@commitlint/cli": "^17.1.2",
 		"@commitlint/config-conventional": "^17.1.0",

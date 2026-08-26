@@ -31,6 +31,7 @@ Join the Discord server to receive live updates, report bugs, or request feature
 ## Navigation
 - <a href="#features">Features</a>
 - <a href="#installation">Installation</a>
+- <a href="#self-hosting-with-docker">Self-hosting with Docker</a>
 - <a href="#changelog">Changelog</a>
 - <a href="#staging-site">Staging Site</a>
 - <a href="#credits">Credits</a>
@@ -146,6 +147,59 @@ Choose the guide based on your version of OverlayPlugin:
 
 If you need to see the old ACTWebSocket or 0.3.4.0 OverlayPlugin guides, they can be accessed [here](https://github.com/GoldenChrysus/ffxiv-ember-overlay/tree/0.15.0-alpha#installation).
 
+## Self-hosting with Docker
+
+Ember Overlay is a static site served by nginx. A NAS Container Manager "Project" can only **pull a pre-built image** — it cannot build from this repository. The image is published to GitHub Container Registry as `ghcr.io/thefel0x/ffxiv-ember-overlay`.
+
+### NAS (compose only)
+
+Paste this into a Container Manager Project. No repo, Dockerfile, or SSH is required.
+
+```yaml
+services:
+  ember-overlay:
+    image: ghcr.io/thefel0x/ffxiv-ember-overlay:latest
+    hostname: ember-overlay
+    container_name: ember-overlay
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      - TZ=Europe/Berlin
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/healthz || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+```
+
+Do not use `network_mode: host`. The container listens on port 80 inside the image, which would collide with DSM's web UI. Change the left-hand port (`8080`) if that port is already used.
+
+On the PC running ACT, set the OverlayPlugin URL to `http://NAS_IP:8080/` — for example `http://192.168.1.50:8080/`.
+
+The first time GitHub Actions publishes the image, GitHub Container Registry may create a **private** package. In GitHub: Packages → `ffxiv-ember-overlay` → Package settings → Change visibility → Public. After that, the NAS can pull with no registry login.
+
+### Docker Desktop (local)
+
+Pull and run the published image:
+
+```bash
+docker compose up -d
+```
+
+Or build locally (does not need the registry):
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+```
+
+Open http://127.0.0.1:8080/ and point OverlayPlugin at that URL.
+
+The overlay is only the web UI. ACT and OverlayPlugin still run on your game PC. If you use OverlayPlugin's WebSocket (OBS, phone, and similar), keep using the ACT WebSocket URL from the [Using the Web Socket](ACT_INSTALLATION.md#using-the-web-socket) guide, with the page hosted at your Docker URL instead of GitHub Pages.
+
+Serve this container over HTTP on your LAN. OverlayPlugin's WebSocket is `ws://`, and browsers block that mixed content if the overlay itself is loaded over HTTPS.
+
 ## Changelog
 
 View the full changelog [here](/CHANGELOG.md).
@@ -212,6 +266,8 @@ To build this yourself, do the following:
         - `npm run build` to build the production environment.
     2. Copy the contents of `/build` to the desired path on your Web server.
     3. Navigate to your.server.host/path/to/app to view the app.
+
+6. To build and run with Docker instead, see [Self-hosting with Docker](#self-hosting-with-docker).
 
 ## Contributing
 

@@ -1,0 +1,16 @@
+services:
+  ember-overlay:
+    image: ghcr.io/thefel0x/ffxiv-ember-overlay:latest
+    hostname: ember-overlay
+    container_name: ember-overlay
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      - TZ=Europe/Berlin
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/healthz || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s

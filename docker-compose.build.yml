@@ -1,0 +1,6 @@
+services:
+  ember-overlay:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghcr.io/thefel0x/ffxiv-ember-overlay:latest

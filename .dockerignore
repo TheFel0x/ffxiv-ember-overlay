@@ -1,0 +1,30 @@
+# dependencies and build output
+node_modules
+build
+coverage
+
+# git and editor
+.git
+.gitignore
+.github
+.husky
+.cursor
+.vscode
+.idea
+.DS_Store
+
+# local env (docker uses .env-cmdrc.docker)
+.env-cmdrc
+.env.local
+.env.*.local
+
+# logs and caches
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# unused local paths
+misc
+scripts/local
+agent-transcripts
